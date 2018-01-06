@@ -9,6 +9,12 @@ const devConfig = {
       path.resolve(__dirname, '../client/index.js')
     ],
   },
+  resolve: {
+    modules: [
+      path.resolve(__dirname, '../'),
+      'node_modules'
+    ]
+  },
   output: {
     path: path.resolve(__dirname, '../build'),
     filename: 'bundle.js',
