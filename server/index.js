@@ -1,30 +1,17 @@
-const path = require('path');
-const express = require('express');
-const webpackConfig = require('../webpack/webpack.config.js');
+import http from 'http';
 
-const app = express();
-const port = 3000;
+import app from './server';
 
-app.disable('x-powered-by');
+const server = http.createServer(app)
 
+let currentApp = app;
 
-if(process.env.NODE_ENV === 'development') {
-  const webpack = require('webpack');
-  const webpackDevMiddleware = require('webpack-dev-middleware');
-  const webpackHotMiddleware = require('webpack-hot-middleware');
-  const compiler = webpack(webpackConfig);
+server.listen(3000);
 
-  app.use(webpackDevMiddleware(compiler, {
-    stats: {colors: true}
-  }));
-  app.use(webpackHotMiddleware(compiler));
+if (module.hot) {
+ module.hot.accept('./server', () => {
+  server.removeListener('request', currentApp);
+  server.on('request', app);
+  currentApp = app;
+ })
 }
-
-
-app.get('*', function(req, res) {
-  res.sendFile(path.join(__dirname, 'views/index.html'));
-});
-
-app.listen(port, function () {
-  console.log(`Listening on http://localhost:${port}`);
-});
